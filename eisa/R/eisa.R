@@ -1,5 +1,5 @@
 
-isa.result.to.ISAModules <- function(modules, data) {
+isa.result.to.ISAModules <- function(modules, data, uniqueEntrez = TRUE) {
 
   new.modules <- new("ISAModules",
                      genes=modules$rows,
@@ -8,10 +8,12 @@ isa.result.to.ISAModules <- function(modules, data) {
                      rundata=modules$rundata)
 
   new.modules@rundata$annotation <- annotation(data)
-  library(paste(sep="", annotation(data), ".db"), character.only=TRUE)
-  new.modules@rundata$organism <- get(paste(sep="", annotation(data),
+  if (uniqueEntrez) 	{
+    library(paste(sep="", annotation(data), ".db"), character.only=TRUE)
+    new.modules@rundata$organism <- get(paste(sep="", annotation(data),
                                             "ORGANISM"))
-
+  }
+  
   new.modules@rundata$pData <- pData(data)
 
   rownames(new.modules@genes) <- featureNames(data)
@@ -79,7 +81,7 @@ ISA <- function(data,
   modules <- isa2::isa(exprs(data), thr.row=thr.gene, thr.col=thr.cond,
                       no.seeds=no.seeds)
 
-  modules <- isa.result.to.ISAModules(modules, data)
+  modules <- isa.result.to.ISAModules(modules, data, uniqueEntrez = uniqueEntrez)
 
   isa2:::isa.status("DONE", "out")
   
